@@ -3,6 +3,8 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import os
+import random
 from scrapy import signals
 
 # useful for handling different item types with a single interface
@@ -101,3 +103,54 @@ class BetscraperDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+class ProxyMiddleware(object):
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings = crawler.settings
+        proxy_file_path = settings.get("PROXY_FILE_PATH")
+        return cls(proxy_file_path)
+    
+    def __init__(self, proxy_file_path):
+        self.proxy_path = proxy_file_path
+        self.proxies = self.load_proxies()
+        self.current_proxy = None
+
+    def load_proxies(self):
+        if os.path.isfile(self.proxy_path ):
+            with open(self.proxy_path, 'r') as file:
+                proxies = [line.strip() for line in file]
+            return proxies
+        else:
+            return []
+
+    def process_request(self, request, spider):
+        if self.current_proxy is None:
+            self.current_proxy = self._get_random_proxy()
+
+        if self.current_proxy:
+            request.meta['proxy'] = self.current_proxy
+
+    def _get_random_proxy(self):
+        if self.proxies:
+            return random.choice(self.proxies)
+        return None
+
+    def process_response(self, request, response, spider):
+        if response.status != 200:
+            return self._retry(request)
+        
+        return response
+
+    def _retry(self, request):
+        if self.current_proxy and self.current_proxy in self.proxies:
+            self.proxies.remove(self.current_proxy)
+            self.current_proxy = self._get_random_proxy()
+
+        if self.current_proxy:
+            request.meta['proxy'] = self.current_proxy
+
+        return request
+
+    def process_exception(self, request, exception, spider):
+        return self._retry(request)
