@@ -125,11 +125,9 @@ class ProxyMiddleware(object):
             return []
 
     def process_request(self, request, spider):
-        if self.current_proxy is None:
-            self.current_proxy = self._get_random_proxy()
-
-        if self.current_proxy:
-            request.meta['proxy'] = self.current_proxy
+        self.current_proxy = self._get_random_proxy()
+        
+        request.meta['proxy'] = self.current_proxy
 
     def _get_random_proxy(self):
         if self.proxies:
@@ -143,12 +141,10 @@ class ProxyMiddleware(object):
         return response
 
     def _retry(self, request):
-        if self.current_proxy and self.current_proxy in self.proxies:
-            self.proxies.remove(self.current_proxy)
-            self.current_proxy = self._get_random_proxy()
+        self.proxies.remove(self.current_proxy)
+        self.current_proxy = self._get_random_proxy()
 
-        if self.current_proxy:
-            request.meta['proxy'] = self.current_proxy
+        request.meta['proxy'] = self.current_proxy
 
         return request
 
