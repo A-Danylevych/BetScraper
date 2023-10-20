@@ -38,5 +38,5 @@ If you want to specify the output format for the scraped data and customize wher
 ## RUN
 To start the web crawler, use the following command:
 ```bash
-scrapy crawl draftkingsspider  
+python -m scrapy crawl draftkingsspider
 ```
