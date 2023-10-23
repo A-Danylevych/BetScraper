@@ -13,7 +13,6 @@ SPIDER_MODULES = ["betscraper.spiders"]
 NEWSPIDER_MODULE = "betscraper.spiders"
 
 FEEDS = {
-    "betdata.csv" : { "format" : "csv", "overwrite" : True },
     "betdata.json" : { "format" : "json", "overwrite" : True }
 }
 
