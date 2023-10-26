@@ -12,9 +12,9 @@ BOT_NAME = "betscraper"
 SPIDER_MODULES = ["betscraper.spiders"]
 NEWSPIDER_MODULE = "betscraper.spiders"
 
-FEEDS = {
-    "betdata.json" : { "format" : "json", "overwrite" : True }
-}
+# FEEDS = {
+#     "betdata.json" : { "format" : "json", "overwrite" : True }
+# }
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -70,7 +70,10 @@ PROXY_FILE_PATH = "proxy_list.txt"
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    "betscraper.pipelines.BetscraperPipeline": 300,
+   "betscraper.pipelines.MongoDBPipeline": 500
 }
+MONGODB_URI= "mongodb://localhost:27017"
+MONGODB_DATABASE="bets"
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
